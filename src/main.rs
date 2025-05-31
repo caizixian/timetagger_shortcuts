@@ -1,6 +1,6 @@
 use anyhow::Context;
 use axum::{
-    Json, Router, debug_handler, extract,
+    Json, Router, extract,
     http::{StatusCode, header::HeaderMap},
     routing::post,
 };
@@ -17,7 +17,6 @@ struct CreateRecord {
 
 static BASE_URL: OnceLock<String> = OnceLock::new();
 
-#[debug_handler]
 async fn create(
     headers: HeaderMap,
     extract::Json(payload): extract::Json<CreateRecord>,
