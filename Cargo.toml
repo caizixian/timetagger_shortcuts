@@ -3,4 +3,12 @@ name = "timetagger_shortcuts"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "timetagger_shortcuts"
+
 [dependencies]
+rand = "0.9.1"
