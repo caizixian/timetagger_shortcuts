@@ -14,7 +14,21 @@ pub struct Record {
     st: Option<f64>,
 }
 
+static KEY_LENGTH: u32 = 8;
+
 impl Record {
+    pub fn new(ds: String) -> Self {
+        let now = get_timestamp();
+        Record {
+            key: crate::generate_key(KEY_LENGTH),
+            t1: now,
+            t2: now,
+            mt: now,
+            ds: Some(ds),
+            st: Some(0.0)
+        }
+    }
+
     pub fn is_running(&self) -> bool {
         self.t1 == self.t2
     }
