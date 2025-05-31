@@ -70,7 +70,15 @@ async fn create(
     Ok(Json(resp))
 }
 
-async fn stop(headers: HeaderMap) -> Result<Json<RecordPutResp>, StatusCode> {
+#[derive(Deserialize)]
+struct StopRecord {
+    filter: Option<String>,
+}
+
+async fn stop(
+    headers: HeaderMap,
+    extract::Json(payload): extract::Json<StopRecord>,
+) -> Result<Json<RecordPutResp>, StatusCode> {
     let authtoken = headers.get("authtoken").ok_or(StatusCode::FORBIDDEN)?;
     let api_client = APIClient::new(
         BASE_URL
@@ -87,9 +95,17 @@ async fn stop(headers: HeaderMap) -> Result<Json<RecordPutResp>, StatusCode> {
         .get_running_records()
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let stop_running_records: Vec<Record> = running_records
+    let stop_running_records = running_records
         .into_iter()
         .filter(|r| r.is_running())
+        .filter(|r| {
+            if let Some(sr) = &payload.filter {
+                let tags = Record::str_to_tags(sr);
+                r.tags().is_superset(&tags)
+            } else {
+                true
+            }
+        })
         .map(|r| r.stop())
         .collect();
     let resp = api_client
