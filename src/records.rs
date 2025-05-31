@@ -42,8 +42,7 @@ impl Record {
         }
     }
 
-    pub fn tags(&self) -> HashSet<String> {
-        let ds = self.ds.as_deref().unwrap_or_default();
+    pub fn str_to_tags(ds: &str) -> HashSet<String> {
         let parts = ds.split(" ");
 
         HashSet::from_iter(
@@ -51,5 +50,10 @@ impl Record {
                 .filter(|part| part.starts_with("#"))
                 .map(|part| part.to_string()),
         )
+    }
+
+    pub fn tags(&self) -> HashSet<String> {
+        let ds = self.ds.as_deref().unwrap_or_default();
+        Self::str_to_tags(ds)
     }
 }
