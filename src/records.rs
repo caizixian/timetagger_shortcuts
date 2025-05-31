@@ -1,4 +1,8 @@
+use std::collections::HashSet;
+
 use serde::Deserialize;
+
+use crate::get_timestamp;
 
 #[derive(Debug, Deserialize)]
 pub struct Record {
@@ -8,6 +12,32 @@ pub struct Record {
     ds: Option<String>,
     mt: u64,
     st: Option<f64>,
+}
+
+impl Record {
+    pub fn is_running(&self) -> bool {
+        self.t1 == self.t2
+    }
+
+    pub fn stop(self) -> Record {
+        let now = get_timestamp();
+        Record {
+            t2: now,
+            mt: now,
+            ..self
+        }
+    }
+
+    pub fn tags(&self) -> HashSet<String> {
+        let ds = self.ds.as_deref().unwrap_or_default();
+        let parts = ds.split(" ");
+
+        HashSet::from_iter(
+            parts
+                .filter(|part| part.starts_with("#"))
+                .map(|part| part.to_string()),
+        )
+    }
 }
 
 #[derive(Debug, Deserialize)]

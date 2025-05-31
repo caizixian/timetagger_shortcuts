@@ -1,21 +1,13 @@
-use crate::{Record, Records};
+use crate::{Record, Records, get_timestamp};
 use anyhow::Result;
 use std::path::Path;
 
-use std::time::{SystemTime, UNIX_EPOCH};
 pub struct APIClient {
     base_url: String,
     authtoken: String,
 }
 
 impl APIClient {
-    fn get_timestamp() -> u64 {
-        SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("System time before UNIX EPOCH!")
-            .as_secs()
-    }
-
     pub fn new(base_url: String, authtoken: String) -> APIClient {
         APIClient {
             base_url,
@@ -62,7 +54,7 @@ impl APIClient {
     }
 
     pub fn get_running_records(&self) -> Result<Vec<Record>> {
-        let now = Self::get_timestamp();
+        let now = get_timestamp();
         let lower_bound = now - 35 * 60;
         let upper_bound = now + 60;
         self.get_records(lower_bound, upper_bound)
