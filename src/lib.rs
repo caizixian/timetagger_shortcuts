@@ -11,4 +11,5 @@ pub(crate) fn get_timestamp() -> u64 {
 }
 
 pub use api::*;
+pub(crate) use keygen::*;
 pub use records::*;

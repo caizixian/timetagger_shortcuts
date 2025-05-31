@@ -1,21 +1,40 @@
-use crate::{Record, Records, get_timestamp};
+use crate::{Record, get_timestamp};
 use anyhow::Result;
+use reqwest::{blocking::Client, header};
+use serde::Deserialize;
 use std::path::Path;
+
+#[derive(Debug, Deserialize)]
+pub struct RecordsResp {
+    pub records: Vec<Record>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RecordPutResp {
+    pub accepted: Vec<String>,
+    pub failed: Vec<String>,
+    pub errors: Vec<String>,
+}
 
 pub struct APIClient {
     base_url: String,
-    authtoken: String,
+    client: Client,
 }
 
 impl APIClient {
-    pub fn new(base_url: String, authtoken: String) -> APIClient {
-        APIClient {
-            base_url,
-            authtoken,
-        }
+    pub fn new(base_url: String, authtoken: String) -> Result<APIClient> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert("authtoken", authtoken.parse()?);
+
+        let client = reqwest::blocking::ClientBuilder::new()
+            .use_rustls_tls()
+            .default_headers(headers)
+            .build()?;
+
+        Ok(APIClient { base_url, client })
     }
 
-    pub fn client_from_file<T: AsRef<Path>>(path: T) -> APIClient {
+    pub fn from_file<T: AsRef<Path>>(path: T) -> Result<APIClient> {
         let mut authtoken = None;
         let mut base_url = None;
         for line in std::fs::read_to_string(path).unwrap().lines() {
@@ -38,18 +57,14 @@ impl APIClient {
     }
 
     pub fn get_records(&self, from: u64, to: u64) -> Result<Vec<Record>> {
-        let client = reqwest::blocking::ClientBuilder::new()
-            .use_rustls_tls()
-            .build()
-            .unwrap();
-        let res = client
+        let res = self
+            .client
             .get(format!(
                 "{}/records?timerange={}-{}",
                 self.base_url, from, to
             ))
-            .header("authtoken", &self.authtoken)
             .send()?;
-        let records: Records = res.json()?;
+        let records: RecordsResp = res.json()?;
         Ok(records.records)
     }
 
@@ -59,6 +74,16 @@ impl APIClient {
         let upper_bound = now + 60;
         self.get_records(lower_bound, upper_bound)
     }
+
+    pub fn put_records(&self, records: Vec<Record>) -> Result<RecordPutResp> {
+        let res = self
+            .client
+            .put(format!("{}/records", self.base_url))
+            .json(&records)
+            .send()?;
+        let results: RecordPutResp = res.json()?;
+        Ok(results)
+    }
 }
 
 #[cfg(test)]
@@ -66,6 +91,6 @@ mod tests {
     use super::*;
 
     fn client_from_env() -> APIClient {
-        APIClient::client_from_file(".env")
+        APIClient::from_file(".env").unwrap()
     }
 }

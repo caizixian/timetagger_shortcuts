@@ -2,7 +2,7 @@ use rand::prelude::*;
 
 static KEY_ALPHABET: &[u8] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-pub fn generate_key(len: u32) -> String {
+pub(crate) fn generate_key(len: u32) -> String {
     // If the size of the alphabet is N
     // We essentially need to generate an N-based number with len digits
     // Which means we need to generate a number in [0, N^len)

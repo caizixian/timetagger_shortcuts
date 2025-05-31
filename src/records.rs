@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::get_timestamp;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Record {
     key: String,
     t1: u64,
@@ -25,7 +25,7 @@ impl Record {
             t2: now,
             mt: now,
             ds: Some(ds),
-            st: Some(0.0)
+            st: Some(0.0),
         }
     }
 
@@ -52,9 +52,4 @@ impl Record {
                 .map(|part| part.to_string()),
         )
     }
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Records {
-    pub(crate) records: Vec<Record>,
 }
