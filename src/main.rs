@@ -113,7 +113,7 @@ async fn main() -> anyhow::Result<()> {
     let app = Router::new()
         .route("/create", post(create))
         .route("/stop", post(stop));
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8003));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8003));
     let listener = TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service()).await?;
     Ok(())
