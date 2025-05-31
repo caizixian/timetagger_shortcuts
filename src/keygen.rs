@@ -1,7 +1,6 @@
 use rand::prelude::*;
 
-static KEY_ALPHABET: &[u8] =
-    b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+static KEY_ALPHABET: &[u8] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 pub fn generate_key(len: u32) -> String {
     // If the size of the alphabet is N
