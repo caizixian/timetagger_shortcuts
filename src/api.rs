@@ -2,7 +2,7 @@ use crate::{Record, get_timestamp};
 use anyhow::Result;
 use reqwest::{Client, header};
 use serde::{Deserialize, Serialize};
-use std::{env, path::Path};
+use std::path::Path;
 
 #[derive(Debug, Deserialize)]
 pub struct RecordsResp {

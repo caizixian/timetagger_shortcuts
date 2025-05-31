@@ -1,5 +1,9 @@
 use anyhow::Context;
-use axum::{Json, Router, extract, http::StatusCode, http::header::HeaderMap, routing::post};
+use axum::{
+    Json, Router, debug_handler, extract,
+    http::{StatusCode, header::HeaderMap},
+    routing::post,
+};
 use serde::Deserialize;
 use std::{net::SocketAddr, sync::OnceLock};
 use timetagger_shortcuts::*;
@@ -13,9 +17,10 @@ struct CreateRecord {
 
 static BASE_URL: OnceLock<String> = OnceLock::new();
 
+#[debug_handler]
 async fn create(
-    extract::Json(payload): extract::Json<CreateRecord>,
     headers: HeaderMap,
+    extract::Json(payload): extract::Json<CreateRecord>,
 ) -> Result<Json<RecordPutResp>, StatusCode> {
     let authtoken = headers.get("authtoken").ok_or(StatusCode::FORBIDDEN)?;
     let api_client = APIClient::new(
