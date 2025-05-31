@@ -86,7 +86,9 @@ impl APIClient {
         let now = get_timestamp();
         let lower_bound = now - 35 * 60;
         let upper_bound = now + 60;
-        self.get_records(lower_bound, upper_bound).await
+        let records = self.get_records(lower_bound, upper_bound).await?;
+        let running_records: Vec<Record> = records.into_iter().filter(|r| r.is_running()).collect();
+        Ok(running_records)
     }
 
     pub async fn put_records(&self, records: Vec<Record>) -> Result<RecordPutResp> {

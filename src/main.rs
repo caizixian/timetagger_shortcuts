@@ -52,11 +52,7 @@ async fn create(
         }
     }
     // Either we don't need to check the running records, or we have finished checking, and there's none that matches
-    let stop_running_records: Vec<Record> = running_records
-        .into_iter()
-        .filter(|r| r.is_running())
-        .map(|r| r.stop())
-        .collect();
+    let stop_running_records: Vec<Record> = running_records.into_iter().map(|r| r.stop()).collect();
     api_client
         .put_records(stop_running_records)
         .await
@@ -97,7 +93,6 @@ async fn stop(
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let stop_running_records = running_records
         .into_iter()
-        .filter(|r| r.is_running())
         .filter(|r| {
             if let Some(sr) = &payload.filter {
                 let tags = Record::str_to_tags(sr);
