@@ -14,7 +14,7 @@ pub struct Record {
     st: Option<f64>,
 }
 
-static KEY_LENGTH: u32 = 8;
+static KEY_LENGTH: usize = 8;
 
 impl Record {
     pub fn new(ds: String) -> Self {
